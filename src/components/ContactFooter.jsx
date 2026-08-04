@@ -39,7 +39,9 @@ const Contact = () => {
           whileHover={{ scale: 1.04 }}
           whileTap={{ scale: 0.97 }}
         >
-          <Button href="mailto:premnath@example.com">Say Hi!</Button>
+          <Button href={socials.find((s) => s.label === "Gmail").href}>
+            Say Hi!
+          </Button>
         </motion.div>
         {/* Socials — mobile only (sidebar is hidden on mobile) */}
         <motion.div

@@ -5,6 +5,7 @@ import SocialSidebar from "./components/SocialSidebar";
 import About from "./components/About";
 import Projects from "./components/Projects";
 import { Contact, Footer } from "./components/ContactFooter";
+// import Experience from "./components/Experience";
 
 function App() {
   return (

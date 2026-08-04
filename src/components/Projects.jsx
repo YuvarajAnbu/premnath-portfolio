@@ -1,183 +1,94 @@
-import { useState, useRef, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faArrowRight,
-  faArrowUpRightFromSquare,
-  faChevronDown,
-} from "@fortawesome/free-solid-svg-icons";
+import { faArrowUpRightFromSquare } from "@fortawesome/free-solid-svg-icons";
 import Button from "./common/Button";
 import Title from "./common/Title";
 import { allProjects } from "../constants/projects";
-import { faGithub } from "@fortawesome/free-brands-svg-icons";
 
-const INITIAL_VISIBLE = 6;
-
-function useColumnCount(ref) {
-  const [cols, setCols] = useState(1);
-  useEffect(() => {
-    if (!ref.current) return;
-    const update = () => {
-      const computed = getComputedStyle(ref.current);
-      setCols(computed.gridTemplateColumns.split(" ").length);
-    };
-    update();
-    const ro = new ResizeObserver(update);
-    ro.observe(ref.current);
-    return () => ro.disconnect();
-  }, [ref]);
-  return cols;
-}
-
-const ProjectCard = ({ project, index, columns }) => (
-  <motion.div
-    initial={{ opacity: 0, y: 40 }}
+const ProjectCard = ({ project, index }) => (
+  <motion.article
+    initial={{ opacity: 0, y: 48 }}
     whileInView={{ opacity: 1, y: 0 }}
     viewport={{ once: true, amount: 0.2 }}
-    transition={{
-      duration: 0.5,
-      ease: "easeOut",
-      delay: (index % columns) * 0.12,
-    }}
-    className="flex flex-col group"
+    transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
+    className="group grid items-start gap-7 lg:grid-cols-12 lg:gap-12 xl:gap-16"
   >
-    <div className="w-full min-w-full md:min-w-[350px] overflow-hidden bg-[#2a2a2b] rounded-sm">
+    <div
+      className={`relative overflow-hidden rounded-lg border border-border bg-[#101827] shadow-2xl shadow-black/20 lg:col-span-6
+         ${index % 2 === 1 ? "lg:order-2" : ""}`}
+    >
       <img
-        src={"./images/projects/" + project.img}
+        src={`./images/projects/${project.img}`}
         alt={project.title}
-        className="w-full h-full object-cover"
+        className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.025]"
+      />
+      <div
+        className="pointer-events-none absolute inset-0 bg-accent/5 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+        aria-hidden="true"
       />
     </div>
-    <div className="flex flex-col flex-1 mt-4">
-      <h3 className="text-primary-text text-lg font-medium mb-3">
-        {project.title}
-      </h3>
 
-      <p className="text-secondary-text text-sm leading-relaxed flex-1 mb-5">
+    <div
+      className={`flex flex-col lg:col-span-6`}
+      //  ${
+      //     index % 2 === 1 ? "lg:order-1" : ""
+      //   }
+    >
+      <h3 className="text-primary-text text-2xl font-medium mb-5">
+        <span className="text-accent font-mono mr-2 tracking-wider">
+          {String(index + 1).padStart(2, "0")}.
+        </span>
+        {project.title}
+      </h3>{" "}
+      <p className="text-secondary-text text-[15px] leading-relaxed flex-1 mb-5">
         {project.description}
       </p>
       {project.tools && project.tools.length > 0 && (
-        <div className="flex flex-wrap gap-[10px] mb-6">
-          {project.tools.map((tool, idx) => (
-            <span
-              key={idx}
-              className="text-xs bg-[rgba(255,255,255,0.16)] text-secondary-text px-2 py-[3px] rounded-sm cursor-default"
+        <ul
+          className="mb-7 flex flex-wrap gap-2"
+          aria-label="Technologies used"
+        >
+          {project.tools.map((tool) => (
+            <li
+              key={tool}
+              className="rounded-sm border border-white/10 bg-white/[0.06] px-2 py-[3px] text-xs text-secondary-text transition-colors duration-200 group-hover:border-accent/20 group-hover:text-primary-text"
             >
               {tool}
-            </span>
+            </li>
           ))}
-        </div>
+        </ul>
       )}
-
       <Button
         href={project.github}
         target="_blank"
-        // variant="link"
         rel="noopener noreferrer"
         size="sm"
-        className="font-normal w-max"
+        className="w-max font-normal"
         aria-label={`View code for ${project.title} on GitHub`}
       >
         View Code
         <FontAwesomeIcon
           icon={faArrowUpRightFromSquare}
           aria-hidden="true"
-          className="text-[14px] ml-1"
+          className="ml-1 text-[14px]"
         />
       </Button>
     </div>
-  </motion.div>
+  </motion.article>
 );
 
-const Projects = () => {
-  const [showAll, setShowAll] = useState(false);
-  const initialProjects = allProjects.slice(0, INITIAL_VISIBLE);
-  const extraProjects = allProjects.slice(INITIAL_VISIBLE);
-  const gridRef = useRef(null);
-  const extraGridRef = useRef(null);
-  const cols = useColumnCount(gridRef);
-  const extraCols = useColumnCount(extraGridRef);
+const Projects = () => (
+  <section id="projects" className="bg-primary-bg py-20 lg:py-28">
+    <div className="mx-auto max-w-[1320px] px-6 md:px-12">
+      <Title>Some Things I've Built</Title>
 
-  return (
-    <section id="projects" className="bg-primary-bg py-20 lg:py-28">
-      <div className="max-w-[1600px] mx-auto px-6 md:px-12">
-        {/* Section heading */}
-        <Title>Some Things I've Built</Title>
-
-        {/* Grid */}
-        <div
-          ref={gridRef}
-          className="grid md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-x-12 gap-y-20"
-        >
-          {initialProjects.map((project, i) => (
-            <ProjectCard key={i} project={project} index={i} columns={cols} />
-          ))}
-        </div>
-
-        {/* Extra projects — animated expand/collapse */}
-        <AnimatePresence initial={false}>
-          {showAll && (
-            <motion.div
-              key="extra"
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: "auto" }}
-              exit={{ opacity: 0, height: 0 }}
-              transition={{ duration: 0.5, ease: "easeInOut" }}
-              className="overflow-hidden"
-              id="extra-projects"
-            >
-              <div
-                ref={extraGridRef}
-                className="grid md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-12 mt-12"
-              >
-                {extraProjects.map((project, i) => (
-                  <ProjectCard
-                    key={i}
-                    project={project}
-                    index={i}
-                    columns={extraCols}
-                  />
-                ))}
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {/* Show More / Show Less */}
-        {allProjects.length > INITIAL_VISIBLE && (
-          <div className="flex justify-end mt-10">
-            <Button
-              variant="secondary"
-              onClick={() => setShowAll((prev) => !prev)}
-              className="font-normal !px-0"
-              aria-expanded={showAll}
-              aria-controls="extra-projects"
-            >
-              {showAll ? (
-                <>
-                  Show Less{" "}
-                  <FontAwesomeIcon
-                    icon={faChevronDown}
-                    aria-hidden="true"
-                    className="ml-1 rotate-180"
-                  />
-                </>
-              ) : (
-                <>
-                  Show More{" "}
-                  <FontAwesomeIcon
-                    icon={faChevronDown}
-                    aria-hidden="true"
-                    className="ml-1"
-                  />
-                </>
-              )}
-            </Button>
-          </div>
-        )}
+      <div className="space-y-20 lg:space-y-28 mt-12">
+        {allProjects.map((project, index) => (
+          <ProjectCard key={project.title} project={project} index={index} />
+        ))}
       </div>
-    </section>
-  );
-};
+    </div>
+  </section>
+);
 
 export default Projects;

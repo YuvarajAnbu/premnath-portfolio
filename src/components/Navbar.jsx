@@ -136,7 +136,10 @@ const Navbar = () => {
                 ease: "easeOut",
               }}
             >
-              <Button onClick={() => scrollToSection("contact")} size="sm">
+              <Button
+                href={socials.find((s) => s.label === "Gmail").href}
+                size="sm"
+              >
                 Say Hi!
               </Button>
             </motion.div>
